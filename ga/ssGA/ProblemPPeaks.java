@@ -18,7 +18,8 @@ public class ProblemPPeaks extends Problem {
   // }
 
   public double Evaluate(Individual Indiv) {
-    return P_PEAKS(Indiv);
+    // return P_PEAKS(Indiv);
+    return SUBSET_SUM(Indiv);
   }
 
   //    PRIVATE METHODS
