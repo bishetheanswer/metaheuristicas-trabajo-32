@@ -24,7 +24,7 @@ def generate_simple_problem(n: int) -> tuple[list[int], int]:
     return weights, c
 
 
-def generate_avis_problem(n):
+def generate_avis_problem(n: int) -> tuple[list[int], int]:
     """Generate an AVIS problem of size n.
 
     Martello, S., & Toth, P. (1990). Knapsack Problems: Algorithms and Computer
@@ -39,10 +39,11 @@ def generate_avis_problem(n):
 
 if __name__ == "__main__":
     n = int(sys.argv[1])
-    weights, c = generate_simple_problem(n)
+    # weights, c = generate_simple_problem(n)
+    weights, c = generate_avis_problem(n)
 
     os.makedirs("problems", exist_ok=True)
-    with open(f"problems/s{n}", "w") as f:
+    with open(f"problems/s{n}_simple", "w") as f:
         f.write(f"{c}\n\n")
         for w in weights:
             f.write(f"{w} ")
