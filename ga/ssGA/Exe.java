@@ -52,11 +52,9 @@ public class Exe {
 
     int geneNumber = problem.getNItems();
     int geneLength = 1;
-    // double targetFitness = problem.getC();
 
     problem.setGeneNumber(geneNumber);
     problem.setGeneLength(geneLength);
-    // problem.setTargetFitness(targetFitness);
 
     if (isTargetFitnessKnown) {
       problem.setTargetFitness(problem.getC());
@@ -66,8 +64,6 @@ public class Exe {
   }
 
   private static Algorithm initializeAlgorithm(ProblemSubsetSum problem, Experiment e) throws Exception {
-    // double mutationProb = (double) e.mutatedGenesNumber /
-    // problem.getGeneNumber();
     double mutationProb = e.mutatedGenesNumber
         / ((double) problem.getGeneNumber() * (double) problem.getGeneLength());
     return new Algorithm(problem, e.populationSize, problem.getGeneNumber(), problem.getGeneLength(), e.crossoverProb,
@@ -79,19 +75,13 @@ public class Exe {
     System.out.println(e);
     for (int i = 0; i < e.nExecutions; i++) {
       ProblemSubsetSum problem = initializeProblem(e.problemInstancePath, e.isTargetFitnessKnown);
-      System.out.println(problem.getTargetFitness());
       Algorithm ga = initializeAlgorithm(problem, e);
 
       for (int step = 0; step < e.maxISteps; step++) {
         ga.goOneStep();
-        // System.out.print(step);
-        // System.out.print(" ");
-        // System.out.println(ga.getBestFitness());
 
-        // if ((problem.isTargetFitnessKnown())
-        // && (ga.getSolution()).getFitness() >= problem.getTargetFitness()) {
         if ((problem.isTargetFitnessKnown())
-            && (ga.getSolution()).getFitness() == problem.getTargetFitness()) {
+            && (ga.getSolution()).getFitness() >= problem.getTargetFitness()) {
           System.out.print("Solution Found! After ");
           System.out.print(problem.getFitnessCounter());
           System.out.println(" evaluations");
@@ -99,11 +89,6 @@ public class Exe {
         }
       }
 
-      // Print the solution
-      // for (int j = 0; j < problem.getGeneNumber() * problem.getGeneLength(); j++)
-      // System.out.print((ga.getSolution()).getAllele(j));
-      // System.out.println();
-      // System.out.println((ga.getSolution()).getFitness());
       String formattedString = String.format("%s, %f, %f, %d, %d, %d, %d, %d, %f\n",
           e.problemInstancePath,
           e.crossoverProb,
@@ -121,18 +106,27 @@ public class Exe {
   public static void main(String args[]) throws Exception {
     int populationSize = 100;
     double[] crossoverProbs = { 0.6, 0.7, 0.8, 0.9, 1 };
-    // int[] mutatedGenesNumbers = { 1, 2, 3, 4, 5 }; // average expected number of
-    // mutated genes per individual
     int[] mutatedGenesNumbers = { 1, 5, 10, 15, 30 }; // average expected number of mutated genes per individual
-    String problemInstancePath = "./problems/s300_simple";
-    // long MAX_ISTEPS = 1500;
-    long MAX_ISTEPS = 1000000;
     int nExecutions = 100;
     Boolean isTargetFitnessKnown = true;
 
-    // s100 --> 500
-    // s200 --> 1000
-    // s300 --> 1500
+    // Experiment 1 (small): s100 --> 500
+    // String problemInstancePath = "./problems/s100";
+    // long MAX_ISTEPS = 500;
+
+    // Experiment 1 (medium): s200 --> 1000
+    // String problemInstancePath = "./problems/s200";
+    // long MAX_ISTEPS = 1000;
+
+    // Experiment 1 (large): s300 --> 1500
+    // String problemInstancePath = "./problems/s300";
+    // long MAX_ISTEPS = 1500;
+
+    // Experiment 2
+    String problemInstancePath = "./problems/s100";
+    // String problemInstancePath = "./problems/s200";
+    // String problemInstancePath = "./problems/s300";
+    long MAX_ISTEPS = 1000000;
 
     List<Experiment> experiments = new ArrayList<>();
     for (double crossoverProb : crossoverProbs) {
