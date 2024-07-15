@@ -9,135 +9,141 @@ package ga.ssGA;
 
 public class Population {
   // PRIVATE MEMORY
-  private int popsize; // The number of individuals
-  private Individual pop[]; // The vector of individuals
+  private int populationSize; // The number of individuals
+  private Individual population[]; // The vector of individuals
 
-  private int chrom_length; // The length of the chromosomes
+  private int chromosomeLength; // The length of the chromosomes
 
   // STATISTICS
-  private int bestp; // The position of the best  individual: [0..popsize-1]
-  private int worstp; // The position of the worst individual: [0..popsize-1]
-  private double bestf; // The best fitness of the present population
-  private double avgf; // The average fitness of the present population
-  private double worstf; // The worst fitness of the present population
-  private double BESTF; // The best fitness ever found during the search
+  private int bestIndividualIndex; // The position of the best individual: [0..popsize-1]
+  private int worstIndividualIndex; // The position of the worst individual: [0..popsize-1]
+  private double bestFitness; // The best fitness of the present population
+  private double averageFitness; // The average fitness of the present population
+  private double worstFitness; // The worst fitness of the present population
+  private double bestFitnessEver; // The best fitness ever found during the search
 
   public Population(int ps, int chroml) {
-    popsize = ps;
-    pop = new Individual[popsize];
-    chrom_length = chroml;
+    populationSize = ps;
+    population = new Individual[populationSize];
+    chromosomeLength = chroml;
 
-    for (int i = 0; i < popsize; i++) pop[i] = new Individual(chroml);
+    for (int i = 0; i < populationSize; i++)
+      population[i] = new Individual(chroml);
 
     // Initialize statistics
-    bestp = 0;
-    worstp = 0;
-    bestf = 0.0;
-    avgf = 0.0;
-    worstf = 9999999999.0;
-    BESTF = 0.0;
+    bestIndividualIndex = 0;
+    worstIndividualIndex = 0;
+    bestFitness = 0.0;
+    averageFitness = 0.0;
+    worstFitness = 9999999999.0;
+    bestFitnessEver = 0.0;
   }
 
-  public int get_popsize() {
-    return popsize;
+  public int getPopulationSize() {
+    return populationSize;
   }
 
-  public int worst_pos() {
-    return worstp;
+  public int worstIndex() {
+    return worstIndividualIndex;
   }
 
-  public Individual get_ith(int index) throws Exception {
-    if ((index < popsize) && (index >= 0)) return pop[index];
-    else throw new Exception("Index out of range when getting a copy of an individual");
+  public Individual getIth(int index) throws Exception {
+    if ((index < populationSize) && (index >= 0))
+      return population[index];
+    else
+      throw new Exception("Index out of range when getting a copy of an individual");
   }
 
-  public void set_ith(int index, Individual indiv) throws Exception {
-    if ((index < popsize) && (index >= 0)) pop[index].assign(indiv);
-    else throw new Exception("Index out of range when inserting and individual");
+  public void setIth(int index, Individual indiv) throws Exception {
+    if ((index < populationSize) && (index >= 0))
+      population[index].assign(indiv);
+    else
+      throw new Exception("Index out of range when inserting and individual");
 
     // ALWAYS RECOMPUTE STATS AFTER INSERTION
-    compute_stats();
+    computeStats();
   }
 
-  public void set_fitness(int index, double fitness) throws Exception {
-    pop[index].set_fitness(fitness);
+  public void setFitness(int index, double fitness) throws Exception {
+    population[index].setFitness(fitness);
   }
 
-  public void compute_stats() {
+  public void computeStats() {
     double f, total;
 
     // Initialize values (always needed!!!)
     total = 0.0;
-    worstf = pop[0].get_fitness();
-    worstp = 0;
-    bestf = pop[0].get_fitness();
-    bestp = 0;
+    worstFitness = population[0].getFitness();
+    worstIndividualIndex = 0;
+    bestFitness = population[0].getFitness();
+    bestIndividualIndex = 0;
 
-    for (int i = 0; i < popsize; i++) {
-      f = pop[i].get_fitness();
-      if (f <= worstf) {
-        worstf = f;
-        worstp = i;
+    for (int i = 0; i < populationSize; i++) {
+      f = population[i].getFitness();
+      if (f <= worstFitness) {
+        worstFitness = f;
+        worstIndividualIndex = i;
       }
-      if (f >= bestf) {
-        bestf = f;
-        bestp = i;
+      if (f >= bestFitness) {
+        bestFitness = f;
+        bestIndividualIndex = i;
       }
-      if (f >= BESTF) {
-        BESTF = f;
+      if (f >= bestFitnessEver) {
+        bestFitnessEver = f;
       }
       total += f;
     }
 
-    avgf = total / (double) popsize;
+    averageFitness = total / (double) populationSize;
   }
 
-  public int get_worstp() {
-    return worstp;
+  public int getWorstIndividualIndex() {
+    return worstIndividualIndex;
   }
 
-  public int get_bestp() {
-    return bestp;
+  public int getBestIndividualIndex() {
+    return bestIndividualIndex;
   }
 
-  public double get_worstf() {
-    return worstf;
+  public double getWorstFitness() {
+    return worstFitness;
   }
 
-  public double get_avgf() {
-    return avgf;
+  public double getAverageFitness() {
+    return averageFitness;
   }
 
-  public double get_bestf() {
-    return bestf;
+  public double getBestFitness() {
+    return bestFitness;
   }
 
-  public double get_BESTF() {
-    return BESTF;
+  public double getBestFitnessEver() {
+    return bestFitnessEver;
   }
 
   public void print() {
-    for (int i = 0; i < popsize; i++) {
+    for (int i = 0; i < populationSize; i++) {
       System.out.print(i);
       System.out.print("   ");
-      for (int j = 0; j < chrom_length; j++) System.out.print(pop[i].get_allele(j));
+      for (int j = 0; j < chromosomeLength; j++)
+        System.out.print(population[i].getAllele(j));
       System.out.print("   ");
-      System.out.println(pop[i].get_fitness());
+      System.out.println(population[i].getFitness());
     }
   }
 
-  public void print_stats() {
-    System.out.print(BESTF);
+  public void printStats() {
+    System.out.print(bestFitnessEver);
     System.out.print("   ");
-    System.out.print(bestf);
+    System.out.print(bestFitness);
     System.out.print("   ");
-    System.out.print(avgf);
+    System.out.print(averageFitness);
     System.out.print("   ");
-    System.out.print(worstf);
+    System.out.print(worstFitness);
     System.out.print("   ");
-    System.out.print(bestp);
+    System.out.print(bestIndividualIndex);
     System.out.print("   ");
-    System.out.println(worstp);
+    System.out.println(worstIndividualIndex);
   }
 }
 // END OF CLASS: Population

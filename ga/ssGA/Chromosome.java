@@ -20,20 +20,22 @@ public class Chromosome implements Serializable {
     L = length;
     for (int i = 0; i < length; i++)
       if (r.nextDouble() > 0.5) // Returns values in [0..1]
-      alleles[i] = 1;
-      else alleles[i] = 0;
+        alleles[i] = 1;
+      else
+        alleles[i] = 0;
   }
 
-  public void set_allele(int index, byte value) {
+  public void setAllele(int index, byte value) {
     alleles[index] = value;
   }
 
-  public byte get_allele(int index) {
+  public byte getAllele(int index) {
     return alleles[index];
   }
 
   public void print() {
-    for (int i = 0; i < L; i++) System.out.print(alleles[i]);
+    for (int i = 0; i < L; i++)
+      System.out.print(alleles[i]);
   }
 }
 // END OF CLASS: Chromosome

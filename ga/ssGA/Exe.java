@@ -7,70 +7,156 @@
 
 package ga.ssGA;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public class Exe {
+
+  private static void loadWeightsAndCapacity(ProblemSubsetSum problem, String problemInstancePath) {
+    Integer C = -1;
+    List<Integer> w = new ArrayList<>();
+    try {
+      File file = new File(problemInstancePath);
+      Scanner scanner = new Scanner(file);
+
+      C = Integer.parseInt(scanner.nextLine().trim());
+
+      scanner.nextLine();
+
+      String[] numbers = scanner.nextLine().split("\\s+");
+      for (String num : numbers) {
+        w.add(Integer.parseInt(num.trim()));
+      }
+
+      scanner.close();
+    } catch (FileNotFoundException e) {
+      System.err.println("File not found at path: " + problemInstancePath);
+    } catch (NumberFormatException e) {
+      System.err.println("Error parsing integer from file.");
+    } catch (Exception e) {
+      System.err.println("An error occurred: " + e.getMessage());
+    }
+    problem.setC(C);
+    problem.setW(w);
+  }
+
+  private static ProblemSubsetSum initializeProblem(String problemInstancePath, Boolean isTargetFitnessKnown) {
+    ProblemSubsetSum problem = new ProblemSubsetSum();
+    loadWeightsAndCapacity(problem, problemInstancePath);
+
+    int geneNumber = problem.getNItems();
+    int geneLength = 1;
+    // double targetFitness = problem.getC();
+
+    problem.setGeneNumber(geneNumber);
+    problem.setGeneLength(geneLength);
+    // problem.setTargetFitness(targetFitness);
+
+    if (isTargetFitnessKnown) {
+      problem.setTargetFitness(problem.getC());
+    }
+
+    return problem;
+  }
+
+  private static Algorithm initializeAlgorithm(ProblemSubsetSum problem, Experiment e) throws Exception {
+    // double mutationProb = (double) e.mutatedGenesNumber /
+    // problem.getGeneNumber();
+    double mutationProb = e.mutatedGenesNumber
+        / ((double) problem.getGeneNumber() * (double) problem.getGeneLength());
+    return new Algorithm(problem, e.populationSize, problem.getGeneNumber(), problem.getGeneLength(), e.crossoverProb,
+        mutationProb);
+  }
+
+  private static void runExperiment(Experiment e, StringBuilder results) throws Exception {
+    System.out.print("Executing ");
+    System.out.println(e);
+    for (int i = 0; i < e.nExecutions; i++) {
+      ProblemSubsetSum problem = initializeProblem(e.problemInstancePath, e.isTargetFitnessKnown);
+      System.out.println(problem.getTargetFitness());
+      Algorithm ga = initializeAlgorithm(problem, e);
+
+      for (int step = 0; step < e.maxISteps; step++) {
+        ga.goOneStep();
+        // System.out.print(step);
+        // System.out.print(" ");
+        // System.out.println(ga.getBestFitness());
+
+        // if ((problem.isTargetFitnessKnown())
+        // && (ga.getSolution()).getFitness() >= problem.getTargetFitness()) {
+        if ((problem.isTargetFitnessKnown())
+            && (ga.getSolution()).getFitness() == problem.getTargetFitness()) {
+          System.out.print("Solution Found! After ");
+          System.out.print(problem.getFitnessCounter());
+          System.out.println(" evaluations");
+          break;
+        }
+      }
+
+      // Print the solution
+      // for (int j = 0; j < problem.getGeneNumber() * problem.getGeneLength(); j++)
+      // System.out.print((ga.getSolution()).getAllele(j));
+      // System.out.println();
+      // System.out.println((ga.getSolution()).getFitness());
+      String formattedString = String.format("%s, %f, %f, %d, %d, %d, %d, %d, %f\n",
+          e.problemInstancePath,
+          e.crossoverProb,
+          ga.getMutationProb(),
+          e.mutatedGenesNumber,
+          e.maxISteps,
+          i,
+          -1,
+          problem.getFitnessCounter(),
+          ga.getSolution().getFitness());
+      results.append(formattedString);
+    }
+  }
+
   public static void main(String args[]) throws Exception {
-    /*
-        // PARAMETERS PPEAKS
-        int    gn         = 512;                           // Gene number
-        int    gl         = 1;                            // Gene length
-        int    popsize    = 512;                          // Population size
-        double pc         = 0.8;                          // Crossover probability
-        double pm  = 1.0/(double)((double)gn*(double)gl); // Mutation probability
-        double tf         = (double)1 ;              // Target fitness beign sought
-        long   MAX_ISTEPS = 50000;
-    */
+    int populationSize = 100;
+    double[] crossoverProbs = { 0.6, 0.7, 0.8, 0.9, 1 };
+    // int[] mutatedGenesNumbers = { 1, 2, 3, 4, 5 }; // average expected number of
+    // mutated genes per individual
+    int[] mutatedGenesNumbers = { 1, 5, 10, 15, 30 }; // average expected number of mutated genes per individual
+    String problemInstancePath = "./problems/s300_simple";
+    // long MAX_ISTEPS = 1500;
+    long MAX_ISTEPS = 1000000;
+    int nExecutions = 100;
+    Boolean isTargetFitnessKnown = true;
 
-    /*
-        // PARAMETERS ONEMAX
-        int gn = 512; // Gene number
-        int gl = 1; // Gene length
-        int popsize = 512; // Population size
-        double pc = 0.8; // Crossover probability
-        double pm = 1.0 / (double) ((double) gn * (double) gl); // Mutation probability
-        double tf = (double) gn * gl; // Target fitness being sought
-        long MAX_ISTEPS = 50000;
-    */
+    // s100 --> 500
+    // s200 --> 1000
+    // s300 --> 1500
 
-    // PARAMETERS SUBSET SUM
-    int gn = 128; // Gene number
-    int gl = 1; // Gene length
-    int popsize = 512; // Population size
-    double pc = 0.8; // Crossover probability
-    double pm = 1.0 / (double) ((double) gn * (double) gl); // Mutation probability
-    double tf = 300500; // Target fitness being sought
-    long MAX_ISTEPS = 50000;
-
-    Problem problem; // The problem being solved
-
-    problem = new ProblemPPeaks();
-    // problem = new ProblemOneMax();
-
-    problem.set_geneN(gn);
-    problem.set_geneL(gl);
-    problem.set_target_fitness(tf);
-
-    Algorithm ga; // The ssGA being used
-    ga = new Algorithm(problem, popsize, gn, gl, pc, pm);
-
-    for (int step = 0; step < MAX_ISTEPS; step++) {
-      ga.go_one_step();
-      System.out.print(step);
-      System.out.print("  ");
-      System.out.println(ga.get_bestf());
-
-      if ((problem.tf_known())
-          && (ga.get_solution()).get_fitness() >= problem.get_target_fitness()) {
-        System.out.print("Solution Found! After ");
-        System.out.print(problem.get_fitness_counter());
-        System.out.println(" evaluations");
-        break;
+    List<Experiment> experiments = new ArrayList<>();
+    for (double crossoverProb : crossoverProbs) {
+      for (int mutatedGenesNumber : mutatedGenesNumbers) {
+        Experiment experiment = new Experiment(populationSize, crossoverProb, mutatedGenesNumber, problemInstancePath,
+            MAX_ISTEPS, nExecutions, isTargetFitnessKnown);
+        experiments.add(experiment);
       }
     }
 
-    // Print the solution
-    for (int i = 0; i < gn * gl; i++) System.out.print((ga.get_solution()).get_allele(i));
-    System.out.println();
-    System.out.println((ga.get_solution()).get_fitness());
+    StringBuilder results = new StringBuilder(
+        "problem,crossoverProb,mutationProb,nMutatedGenes,maxISteps,execution,nGenerations,nFitnessEvaluations,bestFitness\n");
+    for (Experiment e : experiments) {
+      runExperiment(e, results);
+    }
+    try {
+      FileWriter writer = new FileWriter(String.format("%s_results_solution_found_AAAA.csv",
+          problemInstancePath));
+      writer.write(results.toString());
+      writer.close();
+    } catch (IOException e) {
+      System.out.println("An error ocurrer while writing to the file");
+    }
   }
+
 }
 // END OF CLASS: Exe

@@ -26,43 +26,43 @@ public class Individual implements Serializable {
     System.out.println(fitness);
   }
 
-  public int get_length() {
+  public int getLength() {
     return L;
   }
 
-  public void set_fitness(double fit) {
+  public void setFitness(double fit) {
     fitness = fit;
   }
 
-  public double get_fitness() {
+  public double getFitness() {
     return fitness;
   }
 
-  public void set_allele(int index, byte value) {
-    chrom.set_allele(index, value);
+  public void setAllele(int index, byte value) {
+    chrom.setAllele(index, value);
   }
 
-  public byte get_allele(int index) {
-    return chrom.get_allele(index);
+  public byte getAllele(int index) {
+    return chrom.getAllele(index);
   }
 
   private void copy(Chromosome source, Chromosome destination) {
     for (int i = 0; i < L; i++) {
-      destination.set_allele(i, source.get_allele(i));
+      destination.setAllele(i, source.getAllele(i));
     }
   }
 
   public void assign(Individual I) {
-    copy(I.get_chromosome(), chrom);
-    fitness = I.get_fitness();
-    L = I.get_length();
+    copy(I.getChromosome(), chrom);
+    fitness = I.getFitness();
+    L = I.getLength();
   }
 
-  public void set_chrom(Chromosome ch) {
+  public void setChrom(Chromosome ch) {
     copy(ch, chrom);
   }
 
-  public Chromosome get_chromosome() {
+  public Chromosome getChromosome() {
     return chrom;
   }
 }
